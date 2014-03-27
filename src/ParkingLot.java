@@ -7,17 +7,18 @@ public class ParkingLot {
 
     private final int capacity;
     private List<Car> carList;
+    private int parkingLotNum;
 
-    public ParkingLot(int capacity) {
+    public ParkingLot(int capacity, int parkingLotNum) {
         this.carList = new ArrayList<Car>();
         this.capacity = capacity;
+        this.parkingLotNum = parkingLotNum;
     }
 
     public Optional<Ticket> park(Car car) {
         if (this.carList.size() < capacity && !containCar(car)) {
             carList.add(car);
-            Optional<Ticket> ticket = Optional.of(new Ticket(car.getCarNumber()));
-            return ticket;
+            return Optional.of(new Ticket(car.getCarNumber()));
         }
         return Optional.fromNullable(null);
     }
@@ -45,4 +46,14 @@ public class ParkingLot {
         return false;
     }
 
+    public int getParkingLotNum() {
+        return this.parkingLotNum;
+    }
+
+    public boolean isNotFull() {
+        if (carList.size() < capacity) {
+            return true;
+        }
+        return false;
+    }
 }
