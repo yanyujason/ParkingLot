@@ -90,23 +90,20 @@ public class ParkingLotTest {
     public void shouldNotParkToAnyParkingLotWhenAllFull(){
         parkingAllocator.park(car_1);
         parkingAllocator.park(car_2);
-        Car car_3 = new Car("N333333");
-        Car car_4 = new Car("N444444");
-        parkingAllocator.park(car_3);
-        Optional<Ticket> ticket_4 = parkingAllocator.park(car_4);
+        parkingAllocator.park(new Car("N333333"));
 
         assertEquals(smallParkingLot.getCarList().contains(car_2), false);
-        assertFalse(ticket_4.isPresent());
+        assertFalse(parkingAllocator.park(new Car("N444444")).isPresent());
     }
 
     @Test
     public void shouldNotParkAgainWhenParkAndPark(){
         Optional<Ticket> ticket = parkingAllocator.park(car_1);
+        parkingAllocator.park(car_2);
         parkingAllocator.park(car_1);
 
         assertEquals(ticket, Optional.of(new Ticket("N123456")));
         assertTrue(smallParkingLot.getCarList().contains(car_1));
         assertFalse(bigParkingLot.getCarList().contains(car_1));
     }
-
 }

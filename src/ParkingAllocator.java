@@ -16,8 +16,7 @@ public class ParkingAllocator {
         for(ParkingLot parkingLot : parkingLotList){
             boolean isNotFull = parkingLot.isNotFull();
             if(isNotFull || (!isNotFull && parkingLot.getCarList().contains(car))){
-                parkingLot.park(car);
-                return Optional.of(new Ticket(car.getCarNumber()));
+                return parkingLot.park(car);
             }
         }
         return Optional.fromNullable(null);
