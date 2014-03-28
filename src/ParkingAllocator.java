@@ -27,7 +27,7 @@ public class ParkingAllocator {
         Collections.sort(parkingLotList, new Comparator<ParkingLot>() {
             @Override
             public int compare(ParkingLot partingLot_1, ParkingLot partingLot_2) {
-                return partingLot_1.getParkingLotNum() - partingLot_2.getParkingLotNum();
+                return partingLot_1.getPriority() - partingLot_2.getPriority();
             }
         });
         return parkingLotList;

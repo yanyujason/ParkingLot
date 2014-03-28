@@ -7,12 +7,12 @@ public class ParkingLot {
 
     private final int capacity;
     private List<Car> carList;
-    private int parkingLotNum;
+    private int priority;
 
-    public ParkingLot(int capacity, int parkingLotNum) {
+    public ParkingLot(int capacity, int priority) {
         this.carList = new ArrayList<Car>();
         this.capacity = capacity;
-        this.parkingLotNum = parkingLotNum;
+        this.priority = priority;
     }
 
     public Optional<Ticket> park(Car car) {
@@ -46,8 +46,8 @@ public class ParkingLot {
         return false;
     }
 
-    public int getParkingLotNum() {
-        return this.parkingLotNum;
+    public int getPriority() {
+        return this.priority;
     }
 
     public boolean isNotFull() {
