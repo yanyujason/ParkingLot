@@ -15,6 +15,8 @@ public class ParkingLotTest {
     private Car car_1;
     private Car car_2;
     private ParkingAllocator parkingAllocator;
+    private SmartParkingAllocator smartParkingAllocator;
+    private EmptyRatioAllocator emptyRatioAllocator;
 
     @Before
     public void setup() {
@@ -26,6 +28,8 @@ public class ParkingLotTest {
         parkingLotList.add(smallParkingLot);
         parkingLotList.add(bigParkingLot);
         parkingAllocator = new ParkingAllocator(parkingLotList);
+        smartParkingAllocator = new SmartParkingAllocator(parkingLotList);
+        emptyRatioAllocator = new EmptyRatioAllocator(parkingLotList);
     }
 
     @Test
@@ -79,7 +83,7 @@ public class ParkingLotTest {
     }
 
     @Test
-    public void shouldParkToParkingLotTwoWhenFirstIsFull(){
+    public void shouldParkToParkingLotTwoWhenFirstIsFull() {
         parkingAllocator.park(car_1);
         parkingAllocator.park(car_2);
 
@@ -87,7 +91,7 @@ public class ParkingLotTest {
     }
 
     @Test
-    public void shouldNotParkToAnyParkingLotWhenAllFull(){
+    public void shouldNotParkToAnyParkingLotWhenAllFull() {
         parkingAllocator.park(car_1);
         parkingAllocator.park(car_2);
         parkingAllocator.park(new Car("N333333"));
@@ -97,7 +101,7 @@ public class ParkingLotTest {
     }
 
     @Test
-    public void shouldNotParkAgainWhenParkAndPark(){
+    public void shouldNotParkAgainWhenParkAndPark() {
         Optional<Ticket> ticket = parkingAllocator.park(car_1);
         parkingAllocator.park(car_2);
         parkingAllocator.park(car_1);
@@ -105,5 +109,18 @@ public class ParkingLotTest {
         assertEquals(ticket, Optional.of(new Ticket("N123456")));
         assertTrue(smallParkingLot.getCarList().contains(car_1));
         assertFalse(bigParkingLot.getCarList().contains(car_1));
+    }
+
+    @Test
+    public void shouldParkToParkToSecondParkingLot() {
+        smartParkingAllocator.park(car_1);
+        assertEquals(bigParkingLot.contains(car_1), true);
+    }
+
+    @Test
+    public void shouldParkToFirstUsingEmptyRatioAllocator(){
+        bigParkingLot.park(car_1);
+        emptyRatioAllocator.park(car_2);
+        assertTrue(smallParkingLot.contains(car_2));
     }
 }

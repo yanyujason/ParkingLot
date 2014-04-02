@@ -15,7 +15,7 @@ public class ParkingAllocator {
     public Optional<Ticket> park(Car car) {
         for(ParkingLot parkingLot : parkingLotList){
             boolean isNotFull = parkingLot.isNotFull();
-            if(isNotFull || (!isNotFull && parkingLot.getCarList().contains(car))){
+            if(isNotFull || (!isNotFull && parkingLot.contains(car))){
                 return parkingLot.park(car);
             }
         }
@@ -31,4 +31,5 @@ public class ParkingAllocator {
         });
         return parkingLotList;
     }
+
 }

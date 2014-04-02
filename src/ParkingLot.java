@@ -56,4 +56,20 @@ public class ParkingLot {
         }
         return false;
     }
+
+    public boolean contains(Car car) {
+        return getCarList().contains(car);
+    }
+
+    public int remaining() {
+        return this.capacity - this.carList.size();
+    }
+
+    public double emptyRate() {
+        if (this.capacity == 0)
+        {
+            return 1;
+        }
+        return remaining() / this.capacity;
+    }
 }
