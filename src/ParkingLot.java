@@ -7,12 +7,10 @@ public class ParkingLot {
 
     private final int capacity;
     private List<Car> carList;
-    private int priority;
 
-    public ParkingLot(int capacity, int priority) {
+    public ParkingLot(int capacity) {
         this.carList = new ArrayList<Car>();
         this.capacity = capacity;
-        this.priority = priority;
     }
 
     public Optional<Ticket> park(Car car) {
@@ -33,10 +31,6 @@ public class ParkingLot {
         return Optional.fromNullable(null);
     }
 
-    public List<Car> getCarList() {
-        return carList;
-    }
-
     private boolean containCar(Car car) {
         for (Car aCar : this.carList) {
             if (aCar.equals(car)) {
@@ -44,10 +38,6 @@ public class ParkingLot {
             }
         }
         return false;
-    }
-
-    public int getPriority() {
-        return this.priority;
     }
 
     public boolean isNotFull() {
@@ -58,7 +48,7 @@ public class ParkingLot {
     }
 
     public boolean contains(Car car) {
-        return getCarList().contains(car);
+        return this.carList.contains(car);
     }
 
     public int remaining() {
@@ -68,8 +58,12 @@ public class ParkingLot {
     public double emptyRate() {
         if (this.capacity == 0)
         {
-            return 1;
+            return 1.0;
         }
         return remaining() / this.capacity;
+    }
+
+    public List<Car> getCars(){
+        return this.carList;
     }
 }

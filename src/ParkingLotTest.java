@@ -1,4 +1,5 @@
 import com.google.common.base.Optional;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,28 +15,40 @@ public class ParkingLotTest {
     private ParkingLot smallParkingLot;
     private Car car_1;
     private Car car_2;
-    private ParkingAllocator parkingAllocator;
-    private SmartParkingAllocator smartParkingAllocator;
-    private EmptyRatioAllocator emptyRatioAllocator;
+    private Parker parkingAllocator;
+    private Parker smartParkingAllocator;
+    private Parker emptyRatioAllocator;
 
     @Before
     public void setup() {
-        smallParkingLot = new ParkingLot(1, 1);
-        bigParkingLot = new ParkingLot(2, 2); // if the lot number is the same? stable sort? tests can pass
+        smallParkingLot = new ParkingLot(1);
+        bigParkingLot = new ParkingLot(2);
         car_1 = new Car("N123456");
         car_2 = new Car("N654321");
         List<ParkingLot> parkingLotList = new ArrayList<ParkingLot>();
         parkingLotList.add(smallParkingLot);
         parkingLotList.add(bigParkingLot);
-        parkingAllocator = new ParkingAllocator(parkingLotList);
-        smartParkingAllocator = new SmartParkingAllocator(parkingLotList);
-        emptyRatioAllocator = new EmptyRatioAllocator(parkingLotList);
+        parkingAllocator = new Parker(new ParkingAllocator());
+        smartParkingAllocator = new Parker(new SmartParkingAllocator());
+        emptyRatioAllocator = new Parker(new EmptyRatioAllocator());
+        parkingAllocator.addParkingLot(smallParkingLot);
+        parkingAllocator.addParkingLot(bigParkingLot);
+        smartParkingAllocator.addParkingLot(smallParkingLot);
+        smartParkingAllocator.addParkingLot(bigParkingLot);
+        emptyRatioAllocator.addParkingLot(smallParkingLot);
+        emptyRatioAllocator.addParkingLot(bigParkingLot);
+    }
+
+    @After
+    public void clearUp(){
+        smallParkingLot.getCars().clear();
+        bigParkingLot.getCars().clear();
     }
 
     @Test
     public void shouldParkCarWhenNotFull() {
         assertEquals(bigParkingLot.park(car_1), Optional.of(new Ticket("N123456")));
-        assertEquals(bigParkingLot.getCarList().size(), 1);
+        assertTrue(bigParkingLot.contains(car_1));
     }
 
     @Test
@@ -43,7 +56,7 @@ public class ParkingLotTest {
         smallParkingLot.park(car_1);
         Optional<Ticket> ticket_2 = smallParkingLot.park(car_2);
 
-        assertEquals(smallParkingLot.getCarList().contains(car_2), false);
+        assertFalse(smallParkingLot.contains(car_2));
         assertEquals(ticket_2.isPresent(), false);
     }
 
@@ -53,8 +66,8 @@ public class ParkingLotTest {
         bigParkingLot.park(car_1);
 
         assertEquals(ticket_1, Optional.of(new Ticket("N123456")));
-        assertEquals(bigParkingLot.getCarList().contains(car_1), true);
-        assertEquals(bigParkingLot.getCarList().size(), 1);
+        assertTrue(bigParkingLot.contains(car_1));
+        assertEquals(bigParkingLot.remaining(), 1);
     }
 
     @Test
@@ -63,7 +76,7 @@ public class ParkingLotTest {
         Optional<Car> myCar = bigParkingLot.pickUp(ticket);
 
         assertEquals(myCar, Optional.of(car_1));
-        assertEquals(bigParkingLot.getCarList().size(), 0);
+        assertEquals(bigParkingLot.remaining(), 2);
     }
 
     @Test
@@ -78,8 +91,8 @@ public class ParkingLotTest {
     public void shouldParkToParkingLotOne() {
         parkingAllocator.park(car_1);
 
-        assertTrue(smallParkingLot.getCarList().contains(car_1));
-        assertFalse(bigParkingLot.getCarList().contains(car_1));
+        assertTrue(smallParkingLot.contains(car_1));
+        assertFalse(bigParkingLot.contains(car_1));
     }
 
     @Test
@@ -87,7 +100,7 @@ public class ParkingLotTest {
         parkingAllocator.park(car_1);
         parkingAllocator.park(car_2);
 
-        assertTrue(bigParkingLot.getCarList().contains(car_2));
+        assertTrue(bigParkingLot.contains(car_2));
     }
 
     @Test
@@ -96,23 +109,12 @@ public class ParkingLotTest {
         parkingAllocator.park(car_2);
         parkingAllocator.park(new Car("N333333"));
 
-        assertEquals(smallParkingLot.getCarList().contains(car_2), false);
+        assertFalse(smallParkingLot.contains(car_2));
         assertFalse(parkingAllocator.park(new Car("N444444")).isPresent());
     }
 
     @Test
-    public void shouldNotParkAgainWhenParkAndPark() {
-        Optional<Ticket> ticket = parkingAllocator.park(car_1);
-        parkingAllocator.park(car_2);
-        parkingAllocator.park(car_1);
-
-        assertEquals(ticket, Optional.of(new Ticket("N123456")));
-        assertTrue(smallParkingLot.getCarList().contains(car_1));
-        assertFalse(bigParkingLot.getCarList().contains(car_1));
-    }
-
-    @Test
-    public void shouldParkToParkToSecondParkingLot() {
+    public void shouldParkToSecondParkingLot() {
         smartParkingAllocator.park(car_1);
         assertEquals(bigParkingLot.contains(car_1), true);
     }
