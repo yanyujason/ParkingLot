@@ -3,7 +3,7 @@ import com.google.common.base.Optional;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Parker {
+public class Parker implements Parkable{
     protected List<ParkingLot> parkingLots;
     private ParkinglotSelector parkinglotSelector;
 
@@ -21,8 +21,16 @@ public class Parker {
         return Optional.fromNullable(null);
     }
 
+    public Optional<Car> pickUp(Ticket ticket) {
+        for(ParkingLot parkingLot: parkingLots){
+            if (parkingLot.contains(new Car(ticket.getCarNumber()))){
+                return parkingLot.pickUp(ticket);
+            }
+        }
+        return Optional.absent();
+    }
+
     public void addParkingLot(ParkingLot parkingLot) {
         parkingLots.add(parkingLot);
     }
-
 }

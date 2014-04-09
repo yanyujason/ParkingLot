@@ -18,9 +18,12 @@ public class ParkingLotTest {
     private Parker parkingAllocator;
     private Parker smartParkingAllocator;
     private Parker emptyRatioAllocator;
+    private List<Parker> parkers;
+    private Manager manager;
 
     @Before
     public void setup() {
+        parkers = new ArrayList<Parker>();
         smallParkingLot = new ParkingLot(1);
         bigParkingLot = new ParkingLot(2);
         car_1 = new Car("N123456");
@@ -37,10 +40,15 @@ public class ParkingLotTest {
         smartParkingAllocator.addParkingLot(bigParkingLot);
         emptyRatioAllocator.addParkingLot(smallParkingLot);
         emptyRatioAllocator.addParkingLot(bigParkingLot);
+
+        parkers.add(parkingAllocator);
+        parkers.add(smartParkingAllocator);
+        parkers.add(emptyRatioAllocator);
+        manager = new Manager(parkers);
     }
 
     @After
-    public void clearUp(){
+    public void clearUp() {
         smallParkingLot.getCars().clear();
         bigParkingLot.getCars().clear();
     }
@@ -73,7 +81,7 @@ public class ParkingLotTest {
     @Test
     public void shouldPickUpCarWhenCarIsInParkingLot() {
         Optional<Ticket> ticket = bigParkingLot.park(car_1);
-        Optional<Car> myCar = bigParkingLot.pickUp(ticket);
+        Optional<Car> myCar = bigParkingLot.pickUp(ticket.get());
 
         assertEquals(myCar, Optional.of(car_1));
         assertEquals(bigParkingLot.remaining(), 2);
@@ -82,7 +90,7 @@ public class ParkingLotTest {
     @Test
     public void shouldNotPickUpCarWhenNotInParkingLot() {
         Optional<Ticket> ticketOptional = Optional.of(new Ticket("N888888"));
-        Optional<Car> carOptional = bigParkingLot.pickUp(ticketOptional);
+        Optional<Car> carOptional = bigParkingLot.pickUp(ticketOptional.get());
 
         assertEquals(carOptional, Optional.fromNullable(null));
     }
@@ -120,9 +128,28 @@ public class ParkingLotTest {
     }
 
     @Test
-    public void shouldParkToFirstUsingEmptyRatioAllocator(){
+    public void shouldParkToFirstUsingEmptyRatioAllocator() {
         bigParkingLot.park(car_1);
         emptyRatioAllocator.park(car_2);
         assertTrue(smallParkingLot.contains(car_2));
+    }
+
+    @Test
+    public void shouldParkByManager() {
+        assertEquals(manager.park(car_1), Optional.of(new Ticket(("N123456"))));
+    }
+
+    @Test
+    public void shouldPickUpByManager() {
+        Optional<Ticket> ticket = manager.park(car_1);
+        assertEquals(manager.pickUp(ticket.get()), Optional.of(car_1));
+    }
+
+    @Test
+    public void shouldParkBySuperManager(){
+        List<Manager> managers = new ArrayList<Manager>();
+        managers.add(manager);
+        SuperManager superManager = new SuperManager(managers);
+        assertEquals(superManager.park(car_1), Optional.of(new Ticket(("N123456"))));
     }
 }

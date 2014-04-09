@@ -21,9 +21,9 @@ public class ParkingLot {
         return Optional.fromNullable(null);
     }
 
-    public Optional<Car> pickUp(Optional<Ticket> ticket) {
+    public Optional<Car> pickUp(Ticket ticket) {
         for (Car aCar : this.carList) {
-            if (aCar.equals(new Car(ticket.get().getCarNumber()))) {
+            if (aCar.equals(new Car(ticket.getCarNumber()))) {
                 this.carList.remove(aCar);
                 return Optional.of(aCar);
             }
