@@ -1,3 +1,5 @@
+package parkinglot;
+
 public class Ticket {
 
     private String carNumber;

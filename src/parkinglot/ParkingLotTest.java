@@ -1,3 +1,5 @@
+package parkinglot;
+
 import com.google.common.base.Optional;
 import org.junit.After;
 import org.junit.Before;
@@ -44,7 +46,10 @@ public class ParkingLotTest {
         parkers.add(parkingAllocator);
         parkers.add(smartParkingAllocator);
         parkers.add(emptyRatioAllocator);
-        manager = new Manager(parkers);
+        manager = new Manager();
+        for (Parker p : parkers) {
+            manager.add(p);
+        }
     }
 
     @After
@@ -146,10 +151,36 @@ public class ParkingLotTest {
     }
 
     @Test
-    public void shouldParkBySuperManager(){
-        List<Manager> managers = new ArrayList<Manager>();
-        managers.add(manager);
-        SuperManager superManager = new SuperManager(managers);
-        assertEquals(superManager.park(car_1), Optional.of(new Ticket(("N123456"))));
+    public void shouldReturnReportForManager() {
+        String result = "parkinglot.Manager:\n" +
+                "--parkinglot.Manager:\n" +
+                "----parkinglot.Parker:1\n" +
+                "----parkinglot.Parker:0\n" +
+                "--parkinglot.Manager:\n" +
+                "----parkinglot.Parker:0\n" +
+                "--parkinglot.Parker:0\n";
+
+        Manager manager = new Manager();
+        Manager manager1 = new Manager();
+        Parker parker = new Parker(new SmartParkingAllocator());
+        Parker parker2 = new Parker(new SmartParkingAllocator());
+        Parker parker3 = new Parker(new SmartParkingAllocator());
+        Parker parker4 = new Parker(new SmartParkingAllocator());
+        manager1.add(parker);
+        manager1.add(parker2);
+        ParkingLot parkingLot1 = new ParkingLot(2);
+        parker.addParkingLot(parkingLot1);
+        parkingLot1.park(car_1);
+
+        Manager manager2 = new Manager();
+        manager2.add(parker3);
+        manager.add(manager1);
+        manager.add(manager2);
+        manager.add(parker4);
+        StringBuilder stringBuilder = new StringBuilder();
+        manager.apply(new Reporter(0, stringBuilder));
+        assertEquals(stringBuilder.toString(), result);
     }
+
+
 }

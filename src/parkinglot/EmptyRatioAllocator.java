@@ -1,3 +1,5 @@
+package parkinglot;
+
 import com.google.common.base.Optional;
 
 import java.util.List;
